@@ -1,7 +1,7 @@
 package benchmarks;
 
 class CalcPi {
-    private static final int WARMUP_N = 2000;
+    private static final int WARMUP_N = 5000;
     private static final int WARMUP_CALLS = 10;
 
     public static double calcPi(int nTerms) {
@@ -32,7 +32,9 @@ class CalcPi {
         double piApprox = calcPi(nTerms);
         long endTime = System.nanoTime();
 
-        System.out.println((endTime - startTime) + " " + 0.0 + " " + piApprox);
+        double elapsedSeconds = (endTime - startTime) / 1_000_000_000.0;
+
+        System.out.println(elapsedSeconds + " " + 0.0 + " " + piApprox);
     }
 
     public static void main(String[] args) {

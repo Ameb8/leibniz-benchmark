@@ -29,7 +29,8 @@ CFLAGS = -Wall -Wextra -I$(INC_DIR)
 
 # Default target
 .PHONY: all
-all: $(TARGET) $(JAVA_CLASS) $(C_BENCH_EXE)
+all: $(TARGET) $(JAVA_CLASS) $(C_BENCH_EXE) \
+	$(BENCH_BIN)/calc_pi_1 $(BENCH_BIN)/calc_pi_2 $(BENCH_BIN)/calc_pi_3
 
 # Build main C program
 $(TARGET): $(OBJS)
@@ -46,10 +47,23 @@ $(JAVA_CLASS): $(JAVA_SRC)
 	@mkdir -p $(BENCH_BIN)
 	javac -d $(BENCH_BIN) $(JAVA_SRC)
 
-# Compile C benchmark
+# Compile C benchmarks
 $(C_BENCH_EXE): $(C_BENCH_SRC)
 	@mkdir -p $(BENCH_BIN)
 	$(CC) $(C_BENCH_SRC) -o $(C_BENCH_EXE)
+
+$(BENCH_BIN)/calc_pi_1: $(C_BENCH_SRC)
+	@mkdir -p $(BENCH_BIN)
+	$(CC) $(CFLAGS) -O1 $< -o $@
+
+$(BENCH_BIN)/calc_pi_2: $(C_BENCH_SRC)
+	@mkdir -p $(BENCH_BIN)
+	$(CC) $(CFLAGS) -O2 $< -o $@
+
+$(BENCH_BIN)/calc_pi_3: $(C_BENCH_SRC)
+	@mkdir -p $(BENCH_BIN)
+	$(CC) $(CFLAGS) -O3 $< -o $@
+
 
 # Clean build artifacts
 .PHONY: clean

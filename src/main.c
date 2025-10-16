@@ -16,7 +16,7 @@ BenchmarkResult** runBenchmarks() {
           if(!result) { // Benchmark execution or processing failed
                printf("\n\n\nTest '%s' Failed", tests[i]->name);
           } else { // Display benchmark results
-               printf("\n\n\nTest '%s':", result);
+               printf("\n\n\nTest '%s':", tests[i]->name);
                benchmarkPrint(result);
           }
      }

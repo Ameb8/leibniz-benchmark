@@ -13,7 +13,7 @@ double calcPi(int nTerms) {
         if(i % 2 == 1)
             sign = -1;
 
-        pi += sign / (2 * i + 1);
+        pi += sign / (2.0 * i + 1);
     }
 
     return 4 * pi;
