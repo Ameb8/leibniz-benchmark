@@ -8,7 +8,7 @@
 #include "../include/benchmark.h"
 
 
-#define BUF_SIZE 20
+#define BUF_SIZE 60
 
 
 BenchmarkResult* execBenchmark(Test* test) {
@@ -31,7 +31,7 @@ BenchmarkResult* execBenchmark(Test* test) {
         
         close(pipefd[1]); // Close original pipe
         
-        // Execute program
+        execvp(test->exec_path, test->args); // Execute program
 
         return NULL; //Error occurred, exec should not return
     } else { // Parent process
@@ -57,8 +57,41 @@ BenchmarkResult* parseResult(int fd) {
 
     while (total_read < BUF_SIZE - 1) { 
         // Read data from fd
-        bytes_read = read(fd, buffer + total_read, BUF_SIZE - 1 - total_read)
+        bytes_read = read(fd, buffer + total_read, BUF_SIZE - 1 - total_read);
     
-        
+        if (bytes_read == 0) { // End of data read
+            break;
+        } else if { // Read error
+            return NULL;
+        }
+
+        total_read += bytes_read; // Increment bytes read
     }
+
+    buffer[total_read] = '\0';
+    
+    return initBenchmark(buffer);
+}
+
+BenchmarkResult* initBenchmark(char* benchmarkData) {
+    BenchmarkResult* result = malloc(sizeof(BenchmarkResult)); // Allocate result mem
+
+    if(!result) // Error instantiating result
+        return NULL;
+
+    // Read float data into result
+    int parsed = sscanf(
+        benchmarkData,
+        "%lf %lf %lf",
+        &(result->clockTime),
+        &(result->cpuTime),
+        &(result->piEstimate)
+    );
+
+    if(parsed != 3) { // Error reading results
+        free(result);
+        return NULL;
+    }
+
+    return result;
 }
