@@ -1,4 +1,4 @@
-package child_processes.count_pi;
+package benchmarks;
 
 class CalcPi {
     private static final int WARMUP_N = 2000;

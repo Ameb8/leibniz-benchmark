@@ -5,7 +5,7 @@
 #define NUM_TESTS 1
 
 // Define Java test
-static char *const java_args[] = {"java", "child_processes.count_pi.CalcPi", "1000000", NULL};
+static char *const java_args[] = {"java", "-cp", "benchmarks/bin", "benchmarks.CalcPi", "1000000", NULL};
 static const Test JAVA_TEST = {
     .name = "Java Benchmark",
     .exec_path = "java",

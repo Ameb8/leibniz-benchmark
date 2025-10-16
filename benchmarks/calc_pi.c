@@ -1,4 +1,4 @@
-#include <math.h>
+#include <stdio.h>
 
 double calcPi(int nTerms) {
     double pi = 0.0;
@@ -13,4 +13,9 @@ double calcPi(int nTerms) {
     }
 
     return 4 * pi;
+}
+
+int main() {
+    double res = calcPi(1000000);
+    printf("%lf, 1, 1", res);
 }
