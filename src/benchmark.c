@@ -6,34 +6,47 @@
 #include <errno.h>
 
 #include "../include/benchmark.h"
+#include "../include/debug_log.h"
+
+
+BenchmarkResult* parseResult(int fd);
+BenchmarkResult* initBenchmark(char* benchmarkData);
 
 
 #define BUF_SIZE 60
 
 
-BenchmarkResult* execBenchmark(Test* test) {
+BenchmarkResult* execBenchmark(const Test* test) {
     int pipefd[2]; // Pipe to receive output from benchmark subprocess
     pid_t pid; // ID of benchmark process
 
-    if(pipe(pipefd) == -1)   // Error creating pipe
+    DEBUG_LOG("\nStarting Benchmark Exec");
+
+    if(pipe(pipefd) == -1) { // Error creating pipe
+        DEBUG_LOG("\nPipe creation failed");
         return NULL;
+    }
 
     pid = fork(); // Create subprocess
 
-    if(pid < 0) // Error creating subprocess;
+    if(pid < 0) { // Error creating subprocess;
+        DEBUG_LOG("\nFork Failed");
         return NULL;
+    }
 
     if(pid == 0) { // Child process
         close(pipefd[0]); // Close read end of stdout on child process
         
         if(dup2(pipefd[1], STDOUT_FILENO) == -1) // Redirect child's stdout to pipe
             return NULL; // Error redirecting stdout
-        
+
         close(pipefd[1]); // Close original pipe
         
         execvp(test->exec_path, test->args); // Execute program
 
-        return NULL; //Error occurred, exec should not return
+        //Error occurred, execvp should not return
+        DEBUG_LOG("\nExecvp Returned");
+        return NULL; 
     } else { // Parent process
         close(pipefd[1]); // Close write end of pipe
 
@@ -41,7 +54,7 @@ BenchmarkResult* execBenchmark(Test* test) {
         waitpid(pid, &status, 0);
 
         // Get result
-        BenchmarkResult* result = parseOutput(pipefd[0]);
+        BenchmarkResult* result = parseResult(pipefd[0]);
         close(pipefd[0]); // Close pipe
 
         return result;
@@ -61,7 +74,8 @@ BenchmarkResult* parseResult(int fd) {
     
         if (bytes_read == 0) { // End of data read
             break;
-        } else if { // Read error
+        } else if(bytes_read < 0) { // Read error
+            DEBUG_LOG("\nError reading from pipe");
             return NULL;
         }
 
@@ -89,9 +103,19 @@ BenchmarkResult* initBenchmark(char* benchmarkData) {
     );
 
     if(parsed != 3) { // Error reading results
+        DEBUG_LOG("\nError reading floats from: \"%s\"", benchmarkData);
         free(result);
         return NULL;
     }
 
     return result;
+}
+
+void benchmarkPrint(BenchmarkResult* result) {
+    printf( // Print Results
+        "\nClock Time: %lf\nCPU Time: %lf\nPi Result: %lf", 
+        result->clockTime, 
+        result->cpuTime, 
+        result->piEstimate
+    );
 }
