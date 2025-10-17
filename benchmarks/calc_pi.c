@@ -4,6 +4,9 @@
 #include <time.h>
 
 
+#define WARM_UP_N 1000
+
+
 double calcPi(int nTerms) {
     double pi = 0.0;
 
@@ -20,6 +23,8 @@ double calcPi(int nTerms) {
 }
 
 void runBenchmark(int nTerms) {
+    calcPi(WARM_UP_N); // Warm up for caching, branch prediction, etc.
+
     // Declare vars for benchmark timing
     struct timespec wallStart, wallEnd;
     clock_t cpuStart, cpuEnd;

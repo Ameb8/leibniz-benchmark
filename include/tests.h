@@ -9,6 +9,6 @@ typedef struct {
 } Test;
 
 
-const Test** get_tests();
+const Test** get_tests(int* num_tests);
 
 #endif
