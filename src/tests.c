@@ -4,7 +4,7 @@
 
 #include "../include/tests.h"
 
-#define NUM_TESTS 7
+#define NUM_TESTS 8
 #define MAX_ARGS 6
 
 static char* duplicateString(const char* src) {
@@ -24,6 +24,7 @@ Test** getTests(int nTerms, int* numTests) {
 
     // Static template test definitions
     static const char* pyTemplate[] = {"python3", "benchmarks/calc_pi.py", NULL, NULL};
+    static const char* npTemplate[] = {"python3", "benchmarks/calc_pi.py", "-np", NULL, NULL};
     static const char* javaTemplate[] = {"java", "-cp", "benchmarks/bin", "benchmarks.CalcPi", NULL, NULL};
     static const char* cTemplate[] = {"./benchmarks/bin/calc_pi", NULL, NULL};
     static const char* c1Template[] = {"./benchmarks/bin/calc_pi_1", NULL, NULL};
@@ -32,11 +33,12 @@ Test** getTests(int nTerms, int* numTests) {
     static const char* jsTemplate[] = {"node", "benchmarks/calc_pi.js", NULL, NULL};
 
     const char** templates[NUM_TESTS] = {
-        pyTemplate, javaTemplate, cTemplate, c1Template, c2Template, c3Template, jsTemplate
+        pyTemplate, npTemplate, javaTemplate, cTemplate, c1Template, c2Template, c3Template, jsTemplate
     };
 
     const char* names[NUM_TESTS] = {
         "Python Benchmark",
+        "Python NumPy Benchmark",
         "Java Benchmark",
         "C Benchmark",
         "C Benchmark -O1",
@@ -46,6 +48,7 @@ Test** getTests(int nTerms, int* numTests) {
     };
 
     const char* execPaths[NUM_TESTS] = {
+        "python3",
         "python3",
         "java",
         "./benchmarks/bin/calc_pi",
