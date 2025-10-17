@@ -1,5 +1,6 @@
 import time
 import sys
+import numpy as np
 
 def calc_pi(n_terms: int) -> float:
     pi: float = 0.0
@@ -13,6 +14,14 @@ def calc_pi(n_terms: int) -> float:
         pi += sign / (2.0 * i + 1)
     
     return 4 * pi
+
+def calc_pi_numpy(n_terms: int) -> float:
+    i = np.arange(n_terms)
+    signs = (-1) ** i
+    denominators = 2 * i + 1
+    terms = signs / denominators
+    pi = 4 * np.sum(terms)
+    return pi
 
 def run_benchmark(n_terms: int) -> None:
     for i in range(10): # Warmup Python environment
@@ -42,4 +51,5 @@ if __name__ == "__main__":
         print(f"Invalid number format: {sys.argv[1]}")
         sys.exit(1)
 
+    # run_benchmark(n_terms)
     run_benchmark(n_terms)

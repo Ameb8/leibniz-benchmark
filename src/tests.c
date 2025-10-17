@@ -1,66 +1,103 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include "../include/tests.h"
 
-#define NUM_TESTS 6
+#define NUM_TESTS 7
+#define MAX_ARGS 6
 
-// Define Java test
-static char *const java_args[] = {"java", "-cp", "benchmarks/bin", "benchmarks.CalcPi", "10000000", NULL};
-static const Test JAVA_TEST = {
-    .name = "Java Benchmark",
-    .exec_path = "java",
-    .args = java_args
-};
+static char* duplicateString(const char* src) {
+    char* dst = malloc(strlen(src) + 1);
+    if (dst) strcpy(dst, src);
+    return dst;
+}
 
-// C benchmark
-static char *const c_args[] = {"./benchmarks/bin/calc_pi", "10000000", NULL};
-static const Test C_TEST = {
-    .name = "C Benchmark",
-    .exec_path = "./benchmarks/bin/calc_pi",
-    .args = c_args
-};
+static char* intToString(int num) {
+    char buffer[20];
+    snprintf(buffer, sizeof(buffer), "%d", num);
+    return duplicateString(buffer);
+}
 
-static char *const c_args_1[] = {"./benchmarks/bin/calc_pi_1", "10000000", NULL};
-static const Test C_TEST_1 = {
-    .name = "C Benchmark -O1",
-    .exec_path = "./benchmarks/bin/calc_pi_1",
-    .args = c_args_1
-};
-
-static char *const c_args_2[] = {"./benchmarks/bin/calc_pi_2", "10000000", NULL};
-static const Test C_TEST_2 = {
-    .name = "C Benchmark -O2",
-    .exec_path = "./benchmarks/bin/calc_pi_2",
-    .args = c_args_2
-};
-
-static char *const c_args_3[] = {"./benchmarks/bin/calc_pi_3", "10000000", NULL};
-static const Test C_TEST_3 = {
-    .name = "C Benchmark -O3",
-    .exec_path = "./benchmarks/bin/calc_pi_3",
-    .args = c_args_3
-};
-
-// Python Benchmark
-static char *const py_args[] = {"python3", "benchmarks/calc_pi.py", "10000000", NULL};
-static const Test PY_TEST = {
-    .name = "Python Benchmark",
-    .exec_path = "python3",
-    .args = py_args
-};
-
-// NULL-terminated array of test pointers
-const Test* TESTS[] = {
-    &JAVA_TEST,
-    &C_TEST,
-    &C_TEST_1,
-    &C_TEST_2,
-    &C_TEST_3,
-    &PY_TEST,
-    NULL
-};
-
-const Test** get_tests(int* numTests) {
+Test** getTests(int nTerms, int* numTests) {
     *numTests = NUM_TESTS;
-    return TESTS;
+
+    // Static template test definitions
+    static const char* pyTemplate[] = {"python3", "benchmarks/calc_pi.py", NULL, NULL};
+    static const char* javaTemplate[] = {"java", "-cp", "benchmarks/bin", "benchmarks.CalcPi", NULL, NULL};
+    static const char* cTemplate[] = {"./benchmarks/bin/calc_pi", NULL, NULL};
+    static const char* c1Template[] = {"./benchmarks/bin/calc_pi_1", NULL, NULL};
+    static const char* c2Template[] = {"./benchmarks/bin/calc_pi_2", NULL, NULL};
+    static const char* c3Template[] = {"./benchmarks/bin/calc_pi_3", NULL, NULL};
+    static const char* jsTemplate[] = {"node", "benchmarks/calc_pi.js", NULL, NULL};
+
+    const char** templates[NUM_TESTS] = {
+        pyTemplate, javaTemplate, cTemplate, c1Template, c2Template, c3Template, jsTemplate
+    };
+
+    const char* names[NUM_TESTS] = {
+        "Python Benchmark",
+        "Java Benchmark",
+        "C Benchmark",
+        "C Benchmark -O1",
+        "C Benchmark -O2",
+        "C Benchmark -O3",
+        "JavaScript Benchmark"
+    };
+
+    const char* execPaths[NUM_TESTS] = {
+        "python3",
+        "java",
+        "./benchmarks/bin/calc_pi",
+        "./benchmarks/bin/calc_pi_1",
+        "./benchmarks/bin/calc_pi_2",
+        "./benchmarks/bin/calc_pi_3",
+        "node",
+    };
+
+    // Allocate array of test pointers
+    Test** tests = malloc((NUM_TESTS + 1) * sizeof(Test*));
+    tests[NUM_TESTS] = NULL; // NULL-terminate
+
+    char* termStr = intToString(nTerms);
+
+    for (int i = 0; i < NUM_TESTS; i++) {
+        // Allocate Test
+        Test* t = malloc(sizeof(Test));
+        t->name = names[i];
+        t->exec_path = execPaths[i];
+
+        // Count args
+        int argc = 0;
+        while (templates[i][argc] != NULL) argc++;
+
+        // Allocate args array (+2 for termStr and NULL)
+        char** args = malloc((argc + 2) * sizeof(char*));
+
+        for(int j = 0; j < argc; j++)
+            args[j] = duplicateString(templates[i][j]);
+
+        // Insert termStr before NULL
+        args[argc] = duplicateString(termStr);
+        args[argc + 1] = NULL;
+
+        t->args = args;
+        tests[i] = t;
+    }
+
+    free(termStr);
+    return tests;
+}
+
+void freeTests(Test** tests) {
+    for (int i = 0; tests[i] != NULL; i++) {
+        char* const* args = tests[i]->args;
+
+        for (int j = 0; args[j] != NULL; j++)
+            free(args[j]);
+        
+        free((void*)args);
+        free(tests[i]);
+    }
+    free(tests);
 }

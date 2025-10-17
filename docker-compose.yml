@@ -4,4 +4,5 @@ services:
     volumes:
       - .:/app     # Mount current directory into /app in the container
     working_dir: /app
-    command: sh -c "make && ./bin/run"
+    entrypoint: bash entrypoint.sh
+    command: []

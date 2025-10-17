@@ -9,6 +9,7 @@ typedef struct {
 } Test;
 
 
-const Test** get_tests(int* num_tests);
+Test** getTests(int nTerm, int* num_tests);
+void freeTests(Test** tests);
 
 #endif

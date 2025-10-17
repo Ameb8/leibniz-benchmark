@@ -4,11 +4,13 @@
 #include "../include/tests.h"
 #include "../include/benchmark.h"
 
+#define NTERM 1000000
+
 
 BenchmarkResult** runBenchmarks() {
      // Get test cases
      int num_tests;
-     const Test** tests = get_tests(&num_tests);
+     const Test** tests = getTests(NTERM, &num_tests);
 
      for(int i = 0; i < num_tests; i++) { // Run all test cases
           BenchmarkResult* result = execBenchmark(tests[i]); // Execute benchmark
@@ -21,6 +23,7 @@ BenchmarkResult** runBenchmarks() {
           }
      }
 
+     freeTests(tests);
      return NULL;
 }
 
