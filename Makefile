@@ -19,6 +19,11 @@ JAVA_CLASS = $(BENCH_BIN)/benchmarks/CalcPi.class
 C_BENCH_SRC = $(BENCH_DIR)/calc_pi.c
 C_BENCH_EXE = $(BENCH_BIN)/calc_pi
 
+# Go benchmark
+GO_BENCH_SRC = $(BENCH_DIR)/calc_pi.go
+GO_BENCH_EXE = $(BENCH_BIN)/calc_pi_go
+
+
 # Main program
 TARGET = $(BIN_DIR)/run
 SRCS = $(wildcard $(SRC_DIR)/*.c)
@@ -30,7 +35,8 @@ CFLAGS = -Wall -Wextra -I$(INC_DIR)
 # Default target
 .PHONY: all
 all: $(TARGET) $(JAVA_CLASS) $(C_BENCH_EXE) \
-	$(BENCH_BIN)/calc_pi_1 $(BENCH_BIN)/calc_pi_2 $(BENCH_BIN)/calc_pi_3
+	$(BENCH_BIN)/calc_pi_1 $(BENCH_BIN)/calc_pi_2 $(BENCH_BIN)/calc_pi_3 \
+	$(GO_BENCH_EXE)
 
 # Build main C program
 $(TARGET): $(OBJS)
@@ -64,6 +70,9 @@ $(BENCH_BIN)/calc_pi_3: $(C_BENCH_SRC)
 	@mkdir -p $(BENCH_BIN)
 	$(CC) $(CFLAGS) -O3 $< -o $@
 
+$(GO_BENCH_EXE): $(GO_BENCH_SRC)
+	@mkdir -p $(BENCH_BIN)
+	go build -o $(GO_BENCH_EXE) $(GO_BENCH_SRC)
 
 # Clean build artifacts
 .PHONY: clean

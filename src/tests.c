@@ -4,7 +4,7 @@
 
 #include "../include/tests.h"
 
-#define NUM_TESTS 8
+#define NUM_TESTS 9
 #define MAX_ARGS 6
 
 static char* duplicateString(const char* src) {
@@ -31,9 +31,10 @@ Test** getTests(int nTerms, int* numTests) {
     static const char* c2Template[] = {"./benchmarks/bin/calc_pi_2", NULL, NULL};
     static const char* c3Template[] = {"./benchmarks/bin/calc_pi_3", NULL, NULL};
     static const char* jsTemplate[] = {"node", "benchmarks/calc_pi.js", NULL, NULL};
+    static const char* goTemplate[] = {"./benchmarks/bin/calc_pi_go", NULL, NULL};
 
     const char** templates[NUM_TESTS] = {
-        pyTemplate, npTemplate, javaTemplate, cTemplate, c1Template, c2Template, c3Template, jsTemplate
+        pyTemplate, npTemplate, javaTemplate, cTemplate, c1Template, c2Template, c3Template, jsTemplate, goTemplate
     };
 
     const char* names[NUM_TESTS] = {
@@ -44,7 +45,8 @@ Test** getTests(int nTerms, int* numTests) {
         "C Benchmark -O1",
         "C Benchmark -O2",
         "C Benchmark -O3",
-        "JavaScript Benchmark"
+        "JavaScript Benchmark",
+        "Go Benchmark"
     };
 
     const char* execPaths[NUM_TESTS] = {
@@ -56,6 +58,7 @@ Test** getTests(int nTerms, int* numTests) {
         "./benchmarks/bin/calc_pi_2",
         "./benchmarks/bin/calc_pi_3",
         "node",
+        "./benchmarks/bin/calc_pi_go"
     };
 
     // Allocate array of test pointers
