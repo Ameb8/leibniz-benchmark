@@ -16,31 +16,6 @@ BenchmarkResult* initBenchmark(char* benchmarkData);
 #define BUF_SIZE 60
 
 
-BenchmarkResult* benchmarkParse(int fd) {
-    size_t total_read = 0;
-    ssize_t bytes_read;
-    char buffer[BUF_SIZE];
-
-    while (total_read < BUF_SIZE - 1) { 
-        // Read data from fd
-        bytes_read = read(fd, buffer + total_read, BUF_SIZE - 1 - total_read);
-    
-        if (bytes_read == 0) { // End of data read
-            break;
-        } else if(bytes_read < 0) { // Read error
-            DEBUG_LOG("\nError reading from pipe");
-            return NULL;
-        }
-
-        total_read += bytes_read; // Increment bytes read
-    }
-
-    buffer[total_read] = '\0';
-    
-    return benchmarkInit(buffer);
-}
-
-
 BenchmarkResult* benchmarkInit(char* benchmarkData) {
     BenchmarkResult* result = malloc(sizeof(BenchmarkResult)); // Allocate result mem
 
@@ -66,6 +41,32 @@ BenchmarkResult* benchmarkInit(char* benchmarkData) {
 }
 
 
+
+BenchmarkResult* benchmarkParse(int fd) {
+    size_t total_read = 0;
+    ssize_t bytes_read;
+    char buffer[BUF_SIZE];
+
+    while (total_read < BUF_SIZE - 1) { 
+        // Read data from fd
+        bytes_read = read(fd, buffer + total_read, BUF_SIZE - 1 - total_read);
+    
+        if (bytes_read == 0) { // End of data read
+            break;
+        } else if(bytes_read < 0) { // Read error
+            DEBUG_LOG("\nError reading from pipe");
+            return NULL;
+        }
+
+        total_read += bytes_read; // Increment bytes read
+    }
+
+    buffer[total_read] = '\0';
+    
+    return benchmarkInit(buffer);
+}
+
+
 BenchmarkResult* benchmarkRun(const Test* test) {
     BenchmarkResult* res = NULL;
     SubprocessErr err;
@@ -76,7 +77,7 @@ BenchmarkResult* benchmarkRun(const Test* test) {
         printf("\n%s", subprocessErrStr(err));
     } else { // Parse subprocess output to BenchmarkResult
         res = benchmarkParse(run_output);
-        close(res);
+        close(run_output);
     }
 
     return res;

@@ -5,7 +5,6 @@ RUN apt-get update && apt-get install -y \
     build-essential \
     openjdk-17-jdk \
     python3 \
-    python3-numpy \
     golang \
     make \
     ca-certificates \
@@ -15,6 +14,8 @@ RUN apt-get update && apt-get install -y \
 
 # Set working directory
 WORKDIR /app
+
+RUN mkdir -p /app/benchmark_dat /app/plots
 
 # Default command (can be overridden)
 CMD ["make"]

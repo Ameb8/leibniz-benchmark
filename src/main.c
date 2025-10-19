@@ -6,7 +6,7 @@
 
 #define NTERM 1000000
 #define NUM_RUNS 10
-#define DATA_FILE_NAME "benchmark_data.csv"
+#define DATA_FILE_NAME "benchmark_dat/results.csv"
 #define DATA_FILE_LBL "Benchmark,Wall-Clock Time,CPU Time,Pi Result\n"
 
 
@@ -49,9 +49,11 @@ BenchmarkResult** runBenchmarks() {
      return NULL;
 }
 
+void createGraphics();
+
 int main() {
      // testSubprocess();
      runBenchmarks();
-     // createGraphics();
-     system("R --vanilla -f benchmark_results/display_results.R");
+     createGraphics();
+     
 }

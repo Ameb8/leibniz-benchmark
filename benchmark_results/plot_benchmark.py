@@ -1,13 +1,19 @@
+from datetime import datetime
 from pathlib import Path
+
 import pandas as pd
+from pandas import DataFrame # For type hints
 import matplotlib.pyplot as plt
-from pandas import DataFrame
+
 from typing import Union
 
 
-DATA_PATH: Path = Path("benchmark_data.csv")
-OUTPUT_IMAGE_PATH: Path = Path("benchmark_chart.png")
-OUTPUT_IMAGE_PATH_PY_RM: Path = Path("benchmark_chart_py_rm.png")
+CURRENT_TIMESTAMP: str = datetime.now().strftime("%Y%m%d_%H%M")
+
+
+DATA_PATH: Path = Path("benchmark_dat/results.csv")
+OUTPUT_IMAGE_PATH: Path = Path(f"plots/benchmark_{EXEC_TIME}.png")
+OUTPUT_IMAGE_PATH_PY_RM: Path = Path(f"plots/benchmark_no_py_{EXEC_TIME}.png")
 
 
 # Normalize Benchmark Labels to Group by Language
