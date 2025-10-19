@@ -15,7 +15,12 @@ RUN apt-get update && apt-get install -y \
 # Set working directory
 WORKDIR /app
 
+# Create directories for plot data
 RUN mkdir -p /app/benchmark_dat /app/plots
+
+# Install Python dependencies for NumPy benchmark and plot creation
+RUN pip install --no-cache-dir -r requirements.txt \ 
+ && pip install --no-cache-dir -r submodule2/requirements.txt
 
 # Default command (can be overridden)
 CMD ["make"]

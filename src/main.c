@@ -3,11 +3,15 @@
 
 #include "../include/tests.h"
 #include "../include/benchmark.h"
+#include "../include/subprocess.h"
 
 #define NTERM 1000000
 #define NUM_RUNS 10
 #define DATA_FILE_NAME "benchmark_dat/results.csv"
 #define DATA_FILE_LBL "Benchmark,Wall-Clock Time,CPU Time,Pi Result\n"
+#define PLOT_PRGRM_PATH "benchmark_results/plot_benchmark.py"
+#define PLOT_PRGRM_NAME "python3"
+#define PLOT_FAIL_MSG "Error: Failed to plot benchmark results in subprocess."
 
 
 BenchmarkResult** runBenchmarks() {
@@ -49,7 +53,17 @@ BenchmarkResult** runBenchmarks() {
      return NULL;
 }
 
-void createGraphics();
+void createGraphics() {
+     static const char* args[] = {PLOT_PRGRM_NAME, PLOT_PRGRM_PATH, NULL}; // Init args to run plotting program
+     SubprocessErr err; // Holds err for subprocesses
+
+     int run_output = subprocessRun(PLOT_PRGRM_NAME, args, &err); // Execute plotting program
+
+     if(err) // Error running subprocess
+          printf("\n%s\n%s", PLOT_FAIL_MSG, subprocessErrStr(err));
+     else // Parse subprocess output to Benchmark Result
+          close(run_output);
+}
 
 int main() {
      // testSubprocess();
