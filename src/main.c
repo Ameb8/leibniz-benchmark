@@ -53,4 +53,5 @@ int main() {
      // testSubprocess();
      runBenchmarks();
      // createGraphics();
+     system("R --vanilla -f benchmark_results/display_results.R");
 }

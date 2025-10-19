@@ -3,6 +3,10 @@ import sys
 import numpy as np
 from typing import Callable
 
+
+WARMUP_N: int = 10000
+WARMUP_CALLS: int = 10
+
 def calc_pi(n_terms: int) -> float:
     pi: float = 0.0
 
@@ -31,8 +35,8 @@ def run_benchmark(n_terms: int, use_np: bool) -> None:
     if use_np: # Benchmark numpy implementation
         calc_func = calc_pi_numpy
 
-    for i in range(10): # Warmup Python environment
-        calc_func(10000)
+    for i in range(WARMUP_CALLS): # Warmup Python environment
+        calc_func(WARMUP_N)
 
     # Start timings
     start_wall: float = time.time()

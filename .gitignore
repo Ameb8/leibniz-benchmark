@@ -1,7 +1,0 @@
-**/bin/
-.vscode/
-**/obj/
-*.class
-**/__pycache__/
-*.so
-*.pyc

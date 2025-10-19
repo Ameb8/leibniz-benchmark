@@ -1,8 +1,8 @@
 package benchmarks;
 
 class CalcPi {
-    private static final int WARMUP_N = 5000;
-    private static final int WARMUP_CALLS = 10;
+    private static final int WARMUP_N = 12000;
+    private static final int WARMUP_CALLS = 20;
 
     public static double calcPi(int nTerms) {
         double pi = 0.0;

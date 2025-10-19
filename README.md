@@ -8,4 +8,4 @@ Due to the multi-language nature of this project, running locally requires many 
 
 ### Running with Docker
 
-When running this program with the included container, Docker becomes the only system requirement, as the container will handled all other dependencies. The container can be initially built with `docker-compose build` from the project-root directory. Note that this can take upwards of twenty minutes on some systems. However, this command only needs executed once. After the container has finished building, the benchmark can be repeatedly run with `docker-compose --rm run run_benchmark [options]`. 
+When running this program with the included container, Docker becomes the only system requirement, as the container will handled all other dependencies. The container can be initially built with `docker-compose build` from the project-root directory. Note that this can take upwards of thirty minutes on some systems. However, this command only needs executed once. After the container has finished building, the benchmark can be repeatedly run with `docker-compose --rm run run_benchmark [options]` without needing to rebuild the container. 
