@@ -12,7 +12,7 @@ typedef struct {
 } BenchmarkResult;
 
 
-BenchmarkResult* execBenchmark(const Test* test);
+BenchmarkResult* benchmarkRun(const Test* test);
 void benchmarkPrint(BenchmarkResult* result);
 
 #endif

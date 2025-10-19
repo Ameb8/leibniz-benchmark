@@ -13,7 +13,8 @@ typedef enum {
 } SubprocessErr;
 
 
-int runSubprocess(const char* exec_path, char* const* args, SubprocessErr* err);
+int subprocessRun(const char* exec_path, char* const* args, SubprocessErr* err);
+const char* subprocessErrStr(SubprocessErr err);
 
 
 #endif

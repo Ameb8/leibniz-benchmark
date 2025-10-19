@@ -13,7 +13,7 @@
 #define ERR_FLAG -1
 
 
-int runSubprocess(const char* exec_path, char* const* args, SubprocessErr* err) {
+int subprocessRun(const char* exec_path, char* const* args, SubprocessErr* err) {
     int pipefd[2]; // Pipe to receive output from benchmark subprocess
     pid_t pid; // ID of benchmark process
 
@@ -91,4 +91,34 @@ int runSubprocess(const char* exec_path, char* const* args, SubprocessErr* err) 
 
     return ERR_FLAG; // Should not be reached
 }
+
+
+const char* subprocessErrStr(SubprocessErr err) {
+    switch (err) {
+        case RUN_SUCCESS:
+            return "Success: The subprocess executed without any errors.";
+        
+        case RUN_ERR_PIPE:
+            return "Error: Failed to create a pipe for inter-process communication. This usually means the system ran out of file descriptors or resources.";
+        
+        case RUN_ERR_FORK:
+            return "Error: Failed to fork the process. This can happen if the system is under heavy load or if there are limits on process creation.";
+        
+        case RUN_ERR_DUP2:
+            return "Error: Failed to duplicate file descriptor using dup2. This is required to redirect the subprocess's stdout to a pipe.";
+        
+        case RUN_ERR_EXECVP:
+            return "Error: Failed to execute the specified program (execvp failed). Possible reasons include the executable not existing, wrong permissions, or invalid arguments.";
+        
+        case RUN_ERR_WAITPID:
+            return "Error: Failed while waiting for the child process to terminate (waitpid). This might indicate issues with process handling.";
+        
+        case RUN_ERR_CHILD_EXIT:
+            return "Error: The child process did not exit normally (e.g., terminated by a signal or crashed).";
+        
+        default:
+            return "Error: Unknown subprocess error occurred.";
+    }
+}
+
 

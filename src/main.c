@@ -25,7 +25,7 @@ BenchmarkResult** runBenchmarks() {
 
      for(int i = 0; i < numTests; i++) { // Run all test cases
           for(int j = 0; j < NUM_RUNS; j++) {
-               BenchmarkResult* result = execBenchmark(tests[i]); // Execute benchmark
+               BenchmarkResult* result = benchmarkRun(tests[i]); // Execute benchmark
           
                if(!result) { // Benchmark execution or processing failed
                     printf("\n\n\nTest '%s' Failed", tests[i]->name);
