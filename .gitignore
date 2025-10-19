@@ -1,0 +1,7 @@
+*.png
+*.pyc
+*.class
+*.csv
+bin/
+.vscode/
+obj/
