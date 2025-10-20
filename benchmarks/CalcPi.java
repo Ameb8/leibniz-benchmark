@@ -1,5 +1,10 @@
 package benchmarks;
 
+
+import java.lang.management.ManagementFactory;
+import java.lang.management.ThreadMXBean;
+
+
 class CalcPi {
     private static final int WARMUP_N = 12000;
     private static final int WARMUP_CALLS = 20;
@@ -28,13 +33,29 @@ class CalcPi {
     private static void runTest(int nTerms) {
         warmup();
 
-        long startTime = System.nanoTime();
-        double piApprox = calcPi(nTerms);
-        long endTime = System.nanoTime();
+        ThreadMXBean bean = ManagementFactory.getThreadMXBean();
 
-        double elapsedSeconds = (endTime - startTime) / 1_000_000_000.0;
+        // Ensure CPU time is supported
+        if (bean.isCurrentThreadCpuTimeSupported()) {
+            if (!bean.isThreadCpuTimeEnabled()) // Enable CPU time
+                bean.setThreadCpuTimeEnabled(true);
 
-        System.out.println(elapsedSeconds + " " + 0.0 + " " + piApprox);
+            // Start timing
+            long startTime = System.nanoTime();
+            long startCpuTime = bean.getCurrentThreadCpuTime();
+            
+            double piApprox = calcPi(nTerms); // Execute benchmark
+            
+            // End timing
+            long endTime = System.nanoTime();
+            long endCpuTime = bean.getCurrentThreadCpuTime();
+
+            // Calculate results in seconds
+            double elapsedSeconds = (endTime - startTime) / 1_000_000_000.0;
+            double cpuTime = (endCpuTime - startCpuTime) / 1_000_000_000.0;
+
+            System.out.println(elapsedSeconds + " " + cpuTime + " " + piApprox);
+        }
     }
 
     public static void main(String[] args) {
