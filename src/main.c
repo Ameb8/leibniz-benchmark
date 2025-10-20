@@ -49,6 +49,7 @@ BenchmarkResult** runBenchmarks() {
           }
      }
 
+     fclose(benchmarkData);
      freeTests(tests);
      return NULL;
 }
@@ -61,7 +62,7 @@ void createGraphics() {
 
      if(err) // Error running subprocess
           printf("\n%s\n%s", PLOT_FAIL_MSG, subprocessErrStr(err));
-     else // Parse subprocess output to Benchmark Result
+     else // Parse subprocess output to Benchmark Result 
           close(run_output);
 }
 

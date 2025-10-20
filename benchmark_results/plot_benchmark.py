@@ -8,12 +8,10 @@ import matplotlib.pyplot as plt
 from typing import Union
 
 
-CURRENT_TIMESTAMP: str = datetime.now().strftime("%Y%m%d_%H%M")
-
-
-DATA_PATH: Path = Path("benchmark_dat/results.csv")
-OUTPUT_IMAGE_PATH: Path = Path(f"plots/benchmark_{EXEC_TIME}.png")
-OUTPUT_IMAGE_PATH_PY_RM: Path = Path(f"plots/benchmark_no_py_{EXEC_TIME}.png")
+EXEC_TIME: str = datetime.now().strftime("%Y-%m-%d_%H:%M")
+DATA_PATH = Path(__file__).parent.parent / "benchmark_dat/results.csv"
+OUTPUT_IMAGE_PATH = Path(__file__).parent.parent / f"plots/benchmark_{EXEC_TIME}.png"
+OUTPUT_IMAGE_PATH_PY_RM = Path(__file__).parent.parent / f"plots/benchmark_no_py_{EXEC_TIME}.png"
 
 
 # Normalize Benchmark Labels to Group by Language
@@ -131,3 +129,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+     
