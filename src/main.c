@@ -14,6 +14,23 @@
 #define PLOT_FAIL_MSG "Error: Failed to plot benchmark results in subprocess."
 
 
+void printProgressBar(int current, int total) {
+    int barWidth = 50;
+    float progress = (float)current / total;
+    int pos = barWidth * progress;
+
+    printf("\r[");
+    for (int i = 0; i < barWidth; ++i) {
+        if (i < pos) printf("=");
+        else if (i == pos) printf(">");
+        else printf(" ");
+    }
+    printf("] %3d%%", (int)(progress * 100));
+    fflush(stdout);
+}
+
+
+
 BenchmarkResult** runBenchmarks() {
      // Open file for data writing
      FILE* benchmarkData = fopen(DATA_FILE_NAME, "w");
@@ -28,14 +45,15 @@ BenchmarkResult** runBenchmarks() {
      const Test** tests = getTests(NTERM, &numTests);
 
      for(int i = 0; i < numTests; i++) { // Run all test cases
+          printf("\n\nRunning %d iterations of %s as subprocesses", NUM_RUNS,  tests[i]->name);
           for(int j = 0; j < NUM_RUNS; j++) {
                BenchmarkResult* result = benchmarkRun(tests[i]); // Execute benchmark
           
                if(!result) { // Benchmark execution or processing failed
                     printf("\n\n\nTest '%s' Failed", tests[i]->name);
                } else { // Display benchmark results
-                    printf("\n\n\nTest '%s':", tests[i]->name);
-                    benchmarkPrint(result);
+                    //printf("\n\n\nTest '%s':", tests[i]->name);
+                    //benchmarkPrint(result);
 
                     fprintf( // Write run result to file
                          benchmarkData, 
@@ -46,6 +64,8 @@ BenchmarkResult** runBenchmarks() {
                          result->piEstimate
                     );
                }
+
+               printProgressBar(j, NUM_RUNS);
           }
      }
 
