@@ -1,8 +1,18 @@
 services:
-  run_benchmark:
-    build: .
-    volumes:
-      - .:/app     # Mount current directory into /app in the container
-    working_dir: /app
-    entrypoint: bash entrypoint.sh
-    command: []
+  benchmark: # Execute release build with options
+    build: . # Build container image
+    volumes: # Mount host directory
+      - .:/app
+    working_dir: /app # Set container working directory
+    entrypoint: ./entrypoint.sh # Execute entrypoint script
+    environment: # Set build to release
+      - BUILD_TYPE=release
+
+  benchmark_dbg: # Execute debug build with options
+    build: . # Build container image
+    volumes: # Mount host directory
+      - .:/app
+    working_dir: /app # Set container working directory
+    entrypoint: ./entrypoint.sh # Execute entrypoint script
+    environment: # Set build to release
+      - BUILD_TYPE=debug
