@@ -12,6 +12,12 @@
 #define PLOT_PRGRM_PATH "benchmark_results/plot_benchmark.py"
 #define PLOT_PRGRM_NAME "python3"
 #define PLOT_FAIL_MSG "Error: Failed to plot benchmark results in subprocess."
+#define PLOT_CREATE_MSG "Benchmark Results created in leibniz-benchmark/plots."
+#define TEST_SUBPRCS_NAME "bash"
+#define TEST_SUBPRCS_FLAG "-c"
+#define TEST_SUBPRCS_CMD "echo 'Alex'"
+#define TEST_SUBPRCS_ERR_MSG "Error: Subprocess for echo command failed to execute."
+#define TEST_SUBPRCS_SCS_MSG "'Echo' command successfully executed as subprocess"
 
 
 void printProgressBar(int current, int total) {
@@ -45,16 +51,13 @@ BenchmarkResult** runBenchmarks() {
      const Test** tests = getTests(NTERM, &numTests);
 
      for(int i = 0; i < numTests; i++) { // Run all test cases
-          printf("\n\nRunning %d iterations of %s as subprocesses", NUM_RUNS,  tests[i]->name);
+          printf("\n\nRunning %d iterations of %s as subprocesses\n", NUM_RUNS,  tests[i]->name);
           for(int j = 0; j < NUM_RUNS; j++) {
                BenchmarkResult* result = benchmarkRun(tests[i]); // Execute benchmark
           
                if(!result) { // Benchmark execution or processing failed
                     printf("\n\n\nTest '%s' Failed", tests[i]->name);
                } else { // Display benchmark results
-                    //printf("\n\n\nTest '%s':", tests[i]->name);
-                    //benchmarkPrint(result);
-
                     fprintf( // Write run result to file
                          benchmarkData, 
                          "%s,%lf,%lf,%lf\n", 
@@ -65,7 +68,7 @@ BenchmarkResult** runBenchmarks() {
                     );
                }
 
-               printProgressBar(j, NUM_RUNS);
+               printProgressBar(j + 1, NUM_RUNS);
           }
      }
 
@@ -74,20 +77,36 @@ BenchmarkResult** runBenchmarks() {
      return NULL;
 }
 
+void testSubprocess() {
+     static const char* args[] = {TEST_SUBPRCS_NAME, TEST_SUBPRCS_FLAG, TEST_SUBPRCS_CMD, NULL};
+     SubprocessErr err;
+
+     int runOutput = subprocessRun(TEST_SUBPRCS_NAME, args, &err);
+
+     if(err) { // Subprocess execution failed
+          printf("\n%s\n%s\n", TEST_SUBPRCS_ERR_MSG, subprocessErrStr(err));
+     } else {
+          printf("\n%s\n", TEST_SUBPRCS_SCS_MSG);
+          close(runOutput);
+     }
+}
+
 void createGraphics() {
      static const char* args[] = {PLOT_PRGRM_NAME, PLOT_PRGRM_PATH, NULL}; // Init args to run plotting program
      SubprocessErr err; // Holds err for subprocesses
 
-     int run_output = subprocessRun(PLOT_PRGRM_NAME, args, &err); // Execute plotting program
+     int runOutput = subprocessRun(PLOT_PRGRM_NAME, args, &err); // Execute plotting program
 
-     if(err) // Error running subprocess
-          printf("\n%s\n%s", PLOT_FAIL_MSG, subprocessErrStr(err));
-     else // Parse subprocess output to Benchmark Result 
-          close(run_output);
+     if(err) { // Error running subprocess
+          printf("\n%s\n%s\n", PLOT_FAIL_MSG, subprocessErrStr(err));
+     } else { // Parse subprocess output to Benchmark Result 
+          close(runOutput);
+          printf("\n\n%s\n", PLOT_CREATE_MSG);
+     }
 }
 
 int main() {
-     // testSubprocess();
+     testSubprocess();
      runBenchmarks();
      createGraphics();
      
