@@ -9,8 +9,11 @@
 #include "../include/debug_log.h"
 
 
-BenchmarkResult* parseResult(int fd);
-BenchmarkResult* initBenchmark(char* benchmarkData);
+typedef struct {
+    double cpuTime;
+    double clockTime;
+    double piEstimate;
+} BenchmarkResult;
 
 
 #define BUF_SIZE 60
@@ -91,3 +94,62 @@ void benchmarkPrint(BenchmarkResult* result) {
         result->piEstimate
     );
 }
+
+void printProgressBar(int current, int total) {
+    int barWidth = 50;
+    float progress = (float)current / total;
+    int pos = barWidth * progress;
+
+    printf("\r[");
+    for (int i = 0; i < barWidth; ++i) {
+        if (i < pos) printf("=");
+        else if (i == pos) printf(">");
+        else printf(" ");
+    }
+    printf("] %3d%%", (int)(progress * 100));
+    fflush(stdout);
+}
+
+void writeResult(FILE* resultsFile, char* testName, BenchmarkResult* result) {
+    fprintf( // Write run result to file
+            resultsFile, 
+            "%s,%lf,%lf,%lf\n", 
+            testName, 
+            result->clockTime, 
+            result->cpuTime, 
+            result->piEstimate
+    );
+}
+
+
+void runBenchmarks(int nTerm, int numRuns, char* dataName, char* dataLabel) {
+     // Open file for data writing
+     FILE* benchmarkData = fopen(dataName, "w");
+     
+     if(!benchmarkData) // File failed to open
+          return;
+
+     fprintf(benchmarkData, dataLabel); // Write data label
+
+     // Get test cases
+     int numTests;
+     const Test** tests = getTests(nTerm, &numTests);
+
+     for(int i = 0; i < numTests; i++) { // Run all test cases
+          printf("\n\nRunning %d iterations of %s as subprocesses\n", numRuns,  tests[i]->name);
+          for(int j = 0; j < numRuns; j++) {
+               BenchmarkResult* result = benchmarkRun(tests[i]); // Execute benchmark
+          
+               if(!result) // Benchmark execution or processing failed
+                    printf("\n\n\nTest '%s' Failed", tests[i]->name);
+               else // Save benchmark results
+                    writeResult(benchmarkData, tests[i]->name, result);
+
+               printProgressBar(j + 1, numRuns);
+          }
+     }
+
+     fclose(benchmarkData);
+     freeTests(tests);
+}
+

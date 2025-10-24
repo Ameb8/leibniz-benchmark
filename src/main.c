@@ -3,15 +3,14 @@
 #include <unistd.h>
 #include <stdbool.h>
 
-#include "../include/tests.h"
+ 
 #include "../include/benchmark.h"
 #include "../include/subprocess.h"
+#include "../include/config.h"
+#include "../include/help.h"
 
 
-#define NTERM 1000000
-#define NUM_RUNS 10
-#define DATA_FILE_NAME "benchmark_dat/results.csv"
-#define DATA_FILE_LBL "Benchmark,Wall-Clock Time,CPU Time,Pi Result\n"
+
 #define PLOT_PRGRM_PATH "benchmark_results/plot_benchmark.py"
 #define PLOT_PRGRM_NAME "python3"
 #define PLOT_FAIL_MSG "Error: Failed to plot benchmark results in subprocess."
@@ -22,66 +21,8 @@
 #define TEST_SUBPRCS_ERR_MSG "Error: Subprocess for echo command failed to execute."
 #define TEST_SUBPRCS_SCS_MSG "'Echo' command successfully executed as subprocess"
 
-#define HELP_MSG "Help Message Placeholder"
 
 
-
-void printProgressBar(int current, int total) {
-    int barWidth = 50;
-    float progress = (float)current / total;
-    int pos = barWidth * progress;
-
-    printf("\r[");
-    for (int i = 0; i < barWidth; ++i) {
-        if (i < pos) printf("=");
-        else if (i == pos) printf(">");
-        else printf(" ");
-    }
-    printf("] %3d%%", (int)(progress * 100));
-    fflush(stdout);
-}
-
-
-
-BenchmarkResult** runBenchmarks(int nTerm, int numRuns) {
-     // Open file for data writing
-     FILE* benchmarkData = fopen(DATA_FILE_NAME, "w");
-     
-     if(!benchmarkData) // File failed to open
-          return NULL;
-
-     fprintf(benchmarkData, DATA_FILE_LBL); // Write data label
-
-     // Get test cases
-     int numTests;
-     const Test** tests = getTests(nTerm, &numTests);
-
-     for(int i = 0; i < numTests; i++) { // Run all test cases
-          printf("\n\nRunning %d iterations of %s as subprocesses\n", NUM_RUNS,  tests[i]->name);
-          for(int j = 0; j < numRuns; j++) {
-               BenchmarkResult* result = benchmarkRun(tests[i]); // Execute benchmark
-          
-               if(!result) { // Benchmark execution or processing failed
-                    printf("\n\n\nTest '%s' Failed", tests[i]->name);
-               } else { // Display benchmark results
-                    fprintf( // Write run result to file
-                         benchmarkData, 
-                         "%s,%lf,%lf,%lf\n", 
-                         tests[i]->name, 
-                         result->clockTime, 
-                         result->cpuTime, 
-                         result->piEstimate
-                    );
-               }
-
-               printProgressBar(j + 1, numRuns);
-          }
-     }
-
-     fclose(benchmarkData);
-     freeTests(tests);
-     return NULL;
-}
 
 void testSubprocess() {
      static const char* args[] = {TEST_SUBPRCS_NAME, TEST_SUBPRCS_FLAG, TEST_SUBPRCS_CMD, NULL};
@@ -124,8 +65,10 @@ bool parseArgs(int argc, char* argv[], int* nTerm, int* numRuns) {
                     *numRuns = strtol(optarg, NULL, 10);
                     break;
                case 'h': // Print help message and return false
-                    printf("\n%s\n", HELP_MSG);
+                    printHelp();
                     return false;
+               default:
+                    printUsage();
           }
      }
 
@@ -140,7 +83,7 @@ int main(int argc, char* argv[]) {
 
      if(parseArgs(argc, argv, &nTerm, &numRuns)) {
           testSubprocess();
-          runBenchmarks(nTerm, numRuns);
+          runBenchmarks(nTerm, numRuns, DATA_FILE_NAME, DATA_FILE_LBL);
           createGraphics();
      }
 

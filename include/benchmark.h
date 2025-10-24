@@ -5,14 +5,7 @@
 #include "tests.h"
 
 
-typedef struct {
-    double cpuTime;
-    double clockTime;
-    double piEstimate;
-} BenchmarkResult;
+void runBenchmarks(int nTerm, int numRuns, char* dataName, char* dataLabel);
 
-
-BenchmarkResult* benchmarkRun(const Test* test);
-void benchmarkPrint(BenchmarkResult* result);
 
 #endif
