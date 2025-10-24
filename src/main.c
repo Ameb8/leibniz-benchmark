@@ -1,9 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
+#include <stdbool.h>
 
 #include "../include/tests.h"
 #include "../include/benchmark.h"
 #include "../include/subprocess.h"
+
 
 #define NTERM 1000000
 #define NUM_RUNS 10
@@ -18,6 +21,9 @@
 #define TEST_SUBPRCS_CMD "echo 'Alex'"
 #define TEST_SUBPRCS_ERR_MSG "Error: Subprocess for echo command failed to execute."
 #define TEST_SUBPRCS_SCS_MSG "'Echo' command successfully executed as subprocess"
+
+#define HELP_MSG "Help Message Placeholder"
+
 
 
 void printProgressBar(int current, int total) {
@@ -37,7 +43,7 @@ void printProgressBar(int current, int total) {
 
 
 
-BenchmarkResult** runBenchmarks() {
+BenchmarkResult** runBenchmarks(int nTerm, int numRuns) {
      // Open file for data writing
      FILE* benchmarkData = fopen(DATA_FILE_NAME, "w");
      
@@ -48,11 +54,11 @@ BenchmarkResult** runBenchmarks() {
 
      // Get test cases
      int numTests;
-     const Test** tests = getTests(NTERM, &numTests);
+     const Test** tests = getTests(nTerm, &numTests);
 
      for(int i = 0; i < numTests; i++) { // Run all test cases
           printf("\n\nRunning %d iterations of %s as subprocesses\n", NUM_RUNS,  tests[i]->name);
-          for(int j = 0; j < NUM_RUNS; j++) {
+          for(int j = 0; j < numRuns; j++) {
                BenchmarkResult* result = benchmarkRun(tests[i]); // Execute benchmark
           
                if(!result) { // Benchmark execution or processing failed
@@ -68,7 +74,7 @@ BenchmarkResult** runBenchmarks() {
                     );
                }
 
-               printProgressBar(j + 1, NUM_RUNS);
+               printProgressBar(j + 1, numRuns);
           }
      }
 
@@ -105,9 +111,38 @@ void createGraphics() {
      }
 }
 
-int main() {
-     testSubprocess();
-     runBenchmarks();
-     createGraphics();
+
+bool parseArgs(int argc, char* argv[], int* nTerm, int* numRuns) {
+     int opt;
      
+     while((opt = getopt(argc, argv, "n:r:")) != -1) {
+          switch (opt) {
+               case 'n': // Set nterm for leibniz series benchmarks
+                    *nTerm = strtol(optarg, NULL, 10);
+                    break;     
+               case 'r': // Set number of runs for each benchmark
+                    *numRuns = strtol(optarg, NULL, 10);
+                    break;
+               case 'h': // Print help message and return false
+                    printf("\n%s\n", HELP_MSG);
+                    return false;
+          }
+     }
+
+     return true;
+}
+
+
+int main(int argc, char* argv[]) {
+     // Set default test run values
+     int nTerm = NTERM;
+     int numRuns = NUM_RUNS;
+
+     if(parseArgs(argc, argv, &nTerm, &numRuns)) {
+          testSubprocess();
+          runBenchmarks(nTerm, numRuns);
+          createGraphics();
+     }
+
+     return 0;
 }
