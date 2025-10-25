@@ -86,14 +86,6 @@ BenchmarkResult* benchmarkRun(const Test* test) {
     return res;
 }
 
-void benchmarkPrint(BenchmarkResult* result) {
-    printf( // Print Results
-        "\nClock Time: %lf\nCPU Time: %lf\nPi Result: %lf", 
-        result->clockTime, 
-        result->cpuTime, 
-        result->piEstimate
-    );
-}
 
 void printProgressBar(int current, int total) {
     int barWidth = 50;

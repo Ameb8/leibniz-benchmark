@@ -3,18 +3,13 @@
 #include <unistd.h>
 #include <stdbool.h>
 
- 
 #include "../include/benchmark.h"
+#include "../include/plotBenchmark.h"
 #include "../include/subprocess.h"
 #include "../include/config.h"
 #include "../include/help.h"
 
 
-
-#define PLOT_PRGRM_PATH "benchmark_results/plot_benchmark.py"
-#define PLOT_PRGRM_NAME "python3"
-#define PLOT_FAIL_MSG "Error: Failed to plot benchmark results in subprocess."
-#define PLOT_CREATE_MSG "Benchmark Results created in leibniz-benchmark/plots."
 #define TEST_SUBPRCS_NAME "bash"
 #define TEST_SUBPRCS_FLAG "-c"
 #define TEST_SUBPRCS_CMD "echo 'Alex'"
@@ -38,25 +33,13 @@ void testSubprocess() {
      }
 }
 
-void createGraphics() {
-     static const char* args[] = {PLOT_PRGRM_NAME, PLOT_PRGRM_PATH, NULL}; // Init args to run plotting program
-     SubprocessErr err; // Holds err for subprocesses
 
-     int runOutput = subprocessRun(PLOT_PRGRM_NAME, args, &err); // Execute plotting program
-
-     if(err) { // Error running subprocess
-          printf("\n%s\n%s\n", PLOT_FAIL_MSG, subprocessErrStr(err));
-     } else { // Parse subprocess output to Benchmark Result 
-          close(runOutput);
-          printf("\n\n%s\n", PLOT_CREATE_MSG);
-     }
-}
 
 
 bool parseArgs(int argc, char* argv[], int* nTerm, int* numRuns) {
      int opt;
      
-     while((opt = getopt(argc, argv, "n:r:")) != -1) {
+     while((opt = getopt(argc, argv, "n:r:h")) != -1) {
           switch (opt) {
                case 'n': // Set nterm for leibniz series benchmarks
                     *nTerm = strtol(optarg, NULL, 10);
@@ -84,7 +67,7 @@ int main(int argc, char* argv[]) {
      if(parseArgs(argc, argv, &nTerm, &numRuns)) {
           testSubprocess();
           runBenchmarks(nTerm, numRuns, DATA_FILE_NAME, DATA_FILE_LBL);
-          createGraphics();
+          plotBenchmark();
      }
 
      return 0;
