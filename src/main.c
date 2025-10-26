@@ -12,11 +12,24 @@
 
 #define TEST_SUBPRCS_NAME "bash"
 #define TEST_SUBPRCS_FLAG "-c"
-#define TEST_SUBPRCS_CMD "echo 'Alex'"
+#define TEST_SUBPRCS_CMD "echo 'Hello Alex'"
 #define TEST_SUBPRCS_ERR_MSG "Error: Subprocess for echo command failed to execute."
-#define TEST_SUBPRCS_SCS_MSG "'Echo' command successfully executed as subprocess"
+#define TEST_SUBPRCS_SCS_MSG "Echo 'Hello Alex' successfully executed as subprocess with output:"
+#define TEST_READ_FAIL "Error: Output from subprocess demo could not be read."
 
 
+void printPipeOutput(int fd) {
+    char buffer[256];
+    ssize_t bytesRead;
+
+    while ((bytesRead = read(fd, buffer, sizeof(buffer) - 1)) > 0) {
+        buffer[bytesRead] = '\0';  
+        printf("\n%s\n", buffer);
+    }
+
+    if(bytesRead == -1)
+        printf("\n%s\n", TEST_READ_FAIL);
+}
 
 
 void testSubprocess() {
@@ -29,6 +42,7 @@ void testSubprocess() {
           printf("\n%s\n%s\n", TEST_SUBPRCS_ERR_MSG, subprocessErrStr(err));
      } else {
           printf("\n%s\n", TEST_SUBPRCS_SCS_MSG);
+          printPipeOutput(runOutput);
           close(runOutput);
      }
 }
