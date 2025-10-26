@@ -1,4 +1,4 @@
-*.png
+plots/*.png
 *.pyc
 *.class
 *.csv

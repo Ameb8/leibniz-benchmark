@@ -95,3 +95,12 @@ if `dup2` fails to redirect the child processes' stdout to the pipe, `err` is se
 This status is assigned when the child process does not exit normally. Segmentation faults and termination signals, like `SIGKILL`, will trigger this.
 
 
+# Example runs
+
+Example runs of this project can be found in the `example` directory. Included is screen clips of running the benchmark from the terminal, as well as produced plots and csv data. An example run of this project with no options provided is as follows:
+
+![Terminal Benchmark Run](https://github.com/Ameb8/leibniz-benchmark/blob/master/example/run_default/run_default.png)
+
+Additionally, a plot produced from this run can be viewed:
+
+![Benchmark Results](https://github.com/Ameb8/leibniz-benchmark/blob/master/example/run_default/benchmark_2025-10-26_23%3A19.png)

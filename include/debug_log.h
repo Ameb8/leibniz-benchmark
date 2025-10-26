@@ -11,7 +11,7 @@
 
 #if DEBUG 
 // Print message and stack trace
-#define DEBUG_LOG(fmt, ...) \ 
+#define DEBUG_LOG(fmt, ...) \
     fprintf(stderr, "[DEBUG] %s:%d:%s(): " fmt "\n", \
             __FILE__, __LINE__, __func__, ##__VA_ARGS__)
 #else

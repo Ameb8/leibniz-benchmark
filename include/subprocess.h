@@ -1,6 +1,8 @@
 #ifndef SUBPROCESS_H
 #define SUBPROCESS_H
 
+#include <unistd.h> // Allows callers to close pipe
+
 
 typedef enum {
     RUN_SUCCESS = 0,
