@@ -8,7 +8,22 @@ Due to the multi-language nature of this project, running locally requires many 
 
 ### Running with Docker
 
-When running this program with the included container, Docker becomes the only system requirement, as the container will handled all other dependencies. The container can be initially built with `docker-compose build` from the project-root directory. Note that this can take upwards of thirty minutes on some systems. However, this command only needs executed once. After the container has finished building, the benchmark can be repeatedly run with `docker-compose --rm run run_benchmark [options]` without needing to rebuild the container. 
+When running this program with the included container, Docker becomes the only system requirement, as the container will handled all other dependencies. The container can be initially built with `docker-compose build` from the project-root directory. Note that this can take upwards of thirty minutes on some systems. However, this command only needs executed once. After the container has finished building, the benchmark can be repeatedly run with `docker-compose --rm run benchmark [options]` without needing to rebuild the container. When running with docker, manual compilation is not needed, as `make` is automatically invoked in the container. However, if their are existing binaries or object files compiled for a different environment, Docker will not recognize this, and the program will fail.
+
+## How to Run Program
+
+### Compiling instructions
+
+A Makefile is included at the root level of this repository, allowing for straightforward compilation of this program. When the `make` command is run, 8 different targets are build. 6 of these are for running the benchmark programs, 4 of which are C benchmarks with different levels of optimization. Additionally, a Go and Java benchmark are compiled. 2 executables are produced for the main program, with one built with the `DEBUG` environmental variable set to 1. The debug version contains extra print statements, and is intended only for developmental use. Both executables for the main program will be in `leibniz-benchmark/bin`, with `run` being the version meant for general use. Note that when executing across different environments, `make clean` must be run, before rebuilding with the `make` command. 
+
+### Running the Benchmark
+
+This program can be run from the project root directory with `./bin/run [options]`. This will run the program, producing 2 graphics in `leibniz-benchmarks/plots`. Multiple runs can be executed without overwriting plots, as they are postfixed with date/time. Additionally, running the benchmark will produce a csv file of the results in `benchmark_dat`. The csv file is overwritten each run of the program. To run with docker, the program can instead be executed with `docker-compose --rm run benchmark [options]`. 
+
+## Program Options
+
+Multiple flags can be passed to this program as command line arguments during invocation. The `-h` results in the program printing a help message instead of running the benchmark. Additionally, the `-r` flag can be used to define the number or benchmarks executed for each program. For example, if you pass `-r 30`, each program being benchmarked will be executed 30 times, with the average being included in the results. If this flag is not passed or set correctly, it will default to 10. Additionally, the `-n` flag defines how many iterations the leibniz-series will use to estimate pi. In other words, `-n` sets the number of loop iterations executed during benchmarking. The default value for this is 1,000,000. All, some, or none of these flags can be passed when executing, although, if `-h` is passed, all other flags will be ignored. 
+
 
 # Subprocess Management
 
@@ -24,26 +39,26 @@ The interface provided by `subprocess.h` is intentionally slim, with only two fu
 
 Many errors may occur during the execution of a subprocess. `subprocessRun` handles this by assigning error status to the `err` argument during function execution. Additionally, upon error, the function will return `-1` instead of a valid file descriptor. Error status is defined by the `SubprocessErr` enum, defined in `subprocess.h`. The `subprocessRun` caller must declare a `SubprocessErr` variable and pass its address as argument. The success state is defined as zero, thus, the caller can simply check if their `SubprocessErr` variable is true to determine if subprocess execution succeeded. Additionally, a `SubprocessErr` can be passed to the `subprocessErrStr` function to receive a more detailed explanation of the encountered error.
 
-### Parallelism
+## Parallelism
 
 `subprocessRun` is not designed to run multiple subprocesses concurrently, and attempting to do so will likely cause undefined behavior. This is because `subprocessRun` is blocking, thus, the parent process waits until the subprocess completes execution. Attempting to circumnavigate this by using multiple threads in the parent process to call subprocessRun concurrently will cause undefined behavior. However, nesting calls to `subprocessRun` is possible. That is to say, that the child process spawned by `subprocessRun` is free to make additional calls to `subprocessRun`, as long as the child process is doing so in a linear manner. However, if the process tree becomes too deep, the strain on system resources may lead to errors. 
 
 
-## Subprocess Implementation and Management
+# Subprocess Implementation
 
 The opinionated abstraction of subprocess execution allows `subprocessRun` to safely and consistently manage the creation of child processes. `subprocessRun` begins by creating a copy of the parent process, replacing the child process image with one provided by the caller, then waiting for the new processes execution to terminate before allowing the parent process to continue.
 
-### New Process Management
+## New Process Management
 
 `subprocessRun` invokes the `fork` function, creating an exact copy of the parent process, saving the new process id for later use. If the new process is not successfully created, `subprocessRun` will return -1 and set error status to `RUN_ERR_FORK`. The new child process will then invoke `execvp`, replacing the process image and executing the program defined by the `exec_path` argument. if `exec_path` contains a slash character, `execvp` will treat it as a literal path, looking directly in the filesystem for the executable. Otherwise, it will search the `PATH` environmental variable to locate the executable. 
 
 Once the new executable is identified by `execvp`, the kernel completely discards the child process image, including, the `subprocessRun` function, the child process stack, and heap memory. The kernel then reads the `ELF` executable file header from disk. This allows the kernel to map the new program's code, data, and stack into memory, as well as resetting the program counter. Additionally, the `arg` parameter of `subprocessRun` is moved into the stack. These arguments are used as command line arguments when invoking the new process executable. 
 
-### Parent Process Handling
+## Parent Process Handling
 
 While the child process is swapping images and initializing its' environment, the parent will invoke the `waitpid` function with the child's process id. `waitpid` then halts execution of the parent until the child has terminated. This also prevents the child form becoming a zombie process, allowing the kernel to free the child's resources and remove from the process table after execution terminates. 
 
-### Parent-Subprocess Communication
+## Parent-Subprocess Communication
 
 Their are many different ways in which a parent process can communicate with its spawned child processes. In this implementation, the parent process can 'message' the child process by passing arguments in the `args` parameter of `subprocessRun`, or by writing data to a separate file, with the subprocess reading it (the path can be hardcoded into the subprocess or passed as argument from the parent). The subprocess can also return data to the parent by writing to a file, and the parent reading it. However, if the data is not intended to persist, the need to delete the file after reading can be circumnavigated through the child writing data directly to stdout. 
 
@@ -79,10 +94,4 @@ if `dup2` fails to redirect the child processes' stdout to the pipe, `err` is se
 
 This status is assigned when the child process does not exit normally. Segmentation faults and termination signals, like `SIGKILL`, will trigger this.
 
-## Results
 
-### Process Creation and Management
-
-### Parent and Child Process Interactions
-
-## Conclusion
